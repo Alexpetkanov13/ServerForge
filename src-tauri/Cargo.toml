@@ -1,6 +1,6 @@
 [package]
 name = "serverforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Premium Minecraft Java Edition server creation and management"
 authors = ["DHeaven"]
 edition = "2021"

@@ -1,7 +1,7 @@
 {
   "name": "serverforge",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Premium Minecraft Java Edition server creation and management",
   "author": "DHeaven",
   "type": "module",
