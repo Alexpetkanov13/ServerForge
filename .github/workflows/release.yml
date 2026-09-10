@@ -1,0 +1,64 @@
+# Publishing an update:
+#   1. Bump `version` in package.json, src-tauri/tauri.conf.json and
+#      src-tauri/Cargo.toml so all three match (e.g. 0.2.0).
+#   2. Commit, then tag the release:  git tag v0.2.0 && git push origin v0.2.0
+#   3. This workflow builds the signed NSIS installer, creates the GitHub
+#      release and uploads latest.json — installed apps will offer the
+#      update on next launch (or via Settings > Check for updates).
+#
+# Required repository secret (already configured):
+#   TAURI_SIGNING_PRIVATE_KEY — the updater private key. Its public half
+#   lives in src-tauri/tauri.conf.json under plugins.updater.pubkey.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Prepare installer assets
+        run: python scripts/prepare-installer-assets.py
+
+      - name: Build and publish release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "ServerForge ${{ github.ref_name }}"
+          releaseBody: "Download the setup below. Installed apps will also offer this update automatically."
+          releaseDraft: false
+          prerelease: false
+          args: --bundles nsis
