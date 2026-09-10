@@ -26,10 +26,24 @@ export async function checkForUpdates(manual = false): Promise<{ update: Update 
     const update = await check({ timeout: 20_000 });
     return { update };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (manual) return { update: null, error: message };
+    const raw = err instanceof Error ? err.message : String(err);
+    if (manual) return { update: null, error: friendlyUpdateError(raw) };
     return { update: null };
   }
+}
+
+/** Translate plugin errors into something a human can act on. */
+export function friendlyUpdateError(raw: string): string {
+  if (/valid release json|404|not found/i.test(raw)) {
+    return "No published releases found yet — publish a release on GitHub to feed the updater.";
+  }
+  if (/network|dns|failed to fetch|timed out|timeout|offline|connection/i.test(raw)) {
+    return "Couldn't reach the update server. Check your internet connection and try again.";
+  }
+  if (/signature|public key/i.test(raw)) {
+    return "The update couldn't be verified (signature mismatch). It was blocked for your safety.";
+  }
+  return raw;
 }
 
 /** Fold plugin download events into (downloadedBytes, totalBytes|null). */
