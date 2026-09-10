@@ -47,6 +47,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Install asset script dependencies
+        run: python -m pip install pillow
+
       - name: Prepare installer assets
         run: python scripts/prepare-installer-assets.py
 
