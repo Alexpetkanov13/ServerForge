@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api, errorMessage } from "@/lib/api";
+import { applyTheme, normalizeTheme } from "@/lib/themes";
 import type { AppSettings, DownloadProgress, JavaRuntime, SystemInfo } from "@/types";
 
 type AppState = {
@@ -36,6 +37,8 @@ export const useAppStore = create<AppState>((set) => ({
         offline: system.offline,
         ready: true,
       });
+      applyTheme(settings.theme);
+      localStorage.setItem("serverforge:theme", normalizeTheme(settings.theme));
     } catch (err) {
       console.error(errorMessage(err));
       set({ ready: true });
@@ -43,6 +46,8 @@ export const useAppStore = create<AppState>((set) => ({
   },
   saveSettings: async (value) => {
     await api.saveSettings(value);
+    localStorage.setItem("serverforge:theme", normalizeTheme(value.theme));
+    applyTheme(value.theme);
     set({ settings: value });
   },
 }));

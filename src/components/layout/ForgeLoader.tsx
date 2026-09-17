@@ -13,7 +13,7 @@ export function ForgeLoader({ label = "Forging the control plane…" }: { label?
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
         >
           <div className="absolute -inset-6 rounded-full bg-primary/20 blur-2xl" />
-          <img src={logo} alt="" width={72} height={72} className="relative size-[72px] rounded-2xl shadow-[0_0_40px_oklch(0.78_0.15_55_/_0.45)]" />
+          <img src={logo} alt="" width={72} height={72} className="relative size-[72px] rounded-2xl shadow-[0_0_40px_color-mix(in_oklch,var(--primary)_45%,transparent)]" />
         </motion.div>
         <div className="text-sm font-medium tracking-wide text-foreground">ServerForge</div>
         <p className="text-xs text-muted-foreground">{label}</p>
